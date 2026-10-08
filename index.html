@@ -128,8 +128,12 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            background: #f5f5f7;
+        }
+
+        .container.hidden {
+            display: none;
         }
 
         .section {
@@ -140,6 +144,8 @@
             padding: 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e5e7;
+            height: fit-content;
+            max-height: 90vh;
             overflow-y: auto;
         }
 
@@ -295,9 +301,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            min-height: 400px;
             color: #86868b;
             text-align: center;
+            font-size: 15px;
         }
 
         .two-column {
@@ -449,9 +456,9 @@
 
             if (username === DEMO_USER && password === DEMO_PASSWORD) {
                 localStorage.setItem('isLoggedIn', 'true');
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'grid';
-                initApp();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                setupApp();
             } else {
                 errorMsg.classList.add('show');
                 setTimeout(() => {
@@ -462,8 +469,8 @@
 
         function handleLogout() {
             localStorage.removeItem('isLoggedIn');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContainer').classList.add('hidden');
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('username').focus();
@@ -471,9 +478,9 @@
 
         function checkAuth() {
             if (localStorage.getItem('isLoggedIn') === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'grid';
-                initApp();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                setupApp();
             }
         }
 
@@ -486,14 +493,8 @@
         });
 
         // Contract Generator
-        function initApp() {
-            const form = document.getElementById('contractForm');
-            const preview = document.getElementById('contractPreview');
-            const inputs = form.querySelectorAll('input, textarea, select');
-            inputs.forEach(input => {
-                input.addEventListener('input', updatePreview);
-                input.addEventListener('change', updatePreview);
-            });
+        function setupApp() {
+            const inputs = document.querySelectorAll('#contractForm input, #contractForm textarea, #contractForm select');
 
             // Set default dates
             const today = new Date().toISOString().split('T')[0];
@@ -501,6 +502,15 @@
             const endDate = new Date();
             endDate.setMonth(endDate.getMonth() + 3);
             document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+
+            // Attach event listeners
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+
+            // Initial update
+            updatePreview();
         }
 
         function updatePreview() {
